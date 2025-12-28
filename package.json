@@ -1,0 +1,24 @@
+{
+  "name": "spotifywebapi-albumidresquest",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jodique2/SpotifyWebApi-AlbumIdResquest.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jodique2/SpotifyWebApi-AlbumIdResquest/issues"
+  },
+  "homepage": "https://github.com/jodique2/SpotifyWebApi-AlbumIdResquest#readme",
+  "dependencies": {
+    "dotenv": "^17.2.3"
+  }
+}
