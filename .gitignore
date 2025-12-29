@@ -1,5 +1,5 @@
 .env
 node_modules
+downloaded_log.json
 
-/data
-/downloadedSongs
+data

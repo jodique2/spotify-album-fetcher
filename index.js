@@ -1,12 +1,8 @@
-import {
-  getAccessToken,
-  searchSpotify,
-  getArtistAlbums,
-} from "./spotify.js";
-
+import { getAccessToken, searchSpotify, getArtistAlbums } from "./spotify.js";
 import readline from "node:readline";
-import fs from "node:fs/promises";
-import path from "node:path";
+import fs from "fs/promises";
+import path from "path";
+import { execSync } from "child_process";
 
 // criar interface do terminal
 const rl = readline.createInterface({
@@ -20,10 +16,10 @@ function ask(question) {
 
 async function main() {
   const searchText = await ask("🔎 Pesquisa artista ou álbum: ");
+  rl.close();
 
   if (!searchText.trim()) {
     console.log("Pesquisa vazia. A sair...");
-    rl.close();
     return;
   }
 
@@ -36,45 +32,39 @@ async function main() {
 
   if (!artistFinal) {
     console.log("Nenhum resultado encontrado");
-    rl.close();
     return;
   }
 
   const albums = await getArtistAlbums(artistFinal.id, token);
 
-  // JSON FINAL FORMATADO
-    const output = {
+  const output = {
     id_artista: artistFinal.id,
     nome_artista: artistFinal.name,
-    url_artista: `https://open.spotify.com/artist/${artistFinal.id}`,
     albuns: albums.map(album => ({
-        id_album: album.id,
-        nome_album: album.name,
-        url_album: `https://open.spotify.com/album/${album.id}`,
+      id_album: album.id,
+      nome_album: album.name,
+      url_album: `https://open.spotify.com/album/${album.id}`
     })),
-    };
-
-
-  // imprimir JSON bonito
-  console.log(JSON.stringify(output, null, 2));
+  };
 
   // criar pasta data se não existir
   const dataDir = path.join(process.cwd(), "data");
   await fs.mkdir(dataDir, { recursive: true });
 
-  // nome do ficheiro
-  const fileName = `${output.nome_artista
-    .toLowerCase()
-    .replace(/\s+/g, "_")}.json`;
-
+  const fileName = `${output.nome_artista.toLowerCase().replace(/\s+/g, "_")}.json`;
   const filePath = path.join(dataDir, fileName);
 
-  // escrever ficheiro
   await fs.writeFile(filePath, JSON.stringify(output, null, 2), "utf-8");
+  console.log(`\n💾 JSON criado: ${filePath}`);
 
-  console.log(`\n💾 Guardado em: ${filePath}`);
-
-  rl.close();
+  // chamar o script Python automaticamente
+  const pythonScriptPath = path.join(process.cwd(), "processData.py");
+  try {
+    console.log("\n🚀 Iniciando downloads com Python...");
+    execSync(`python "${pythonScriptPath}"`, { stdio: "inherit" });
+  } catch (err) {
+    console.error("❌ Erro ao executar o Python:", err.message);
+  }
 }
 
 main();
